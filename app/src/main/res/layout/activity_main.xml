@@ -43,11 +43,9 @@
                 <GridLayout
                     android:id="@+id/projectGrid"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:columnCount="2"
-                    android:orientation="horizontal"
-                    android:padding="10dp"
-                    android:useDefaultMargins="true">
+                    android:padding="16dp">
                 </GridLayout>
             </ScrollView>
         </LinearLayout>
