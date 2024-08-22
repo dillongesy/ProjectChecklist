@@ -1,1 +1,1 @@
-For project managers pouring concrete around the globe.
+For managing simple project tasks.
