@@ -50,15 +50,17 @@
 
             <Button
                 android:id="@+id/addCheckboxButton"
-                android:layout_width="wrap_content"
+                android:layout_width="150sp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="37sp"
                 android:text="Add Task"
                 android:layout_marginEnd="8dp"/>
 
             <Button
                 android:id="@+id/deleteCheckboxButton"
-                android:layout_width="wrap_content"
+                android:layout_width="150sp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="37sp"
                 android:text="Delete Task"/>
     </LinearLayout>
 
@@ -70,7 +72,7 @@
 
         <Button
             android:id="@+id/backButton"
-            android:layout_width="wrap_content"
+            android:layout_width="180sp"
             android:layout_height="wrap_content"
             android:text="Back to Projects"
             android:layout_marginEnd="16dp"
@@ -80,7 +82,7 @@
 
         <Button
             android:id="@+id/closeButton"
-            android:layout_width="wrap_content"
+            android:layout_width="180sp"
             android:layout_height="wrap_content"
             android:text="Close Project"
             android:padding="16dp"
