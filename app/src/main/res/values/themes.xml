@@ -3,6 +3,9 @@
     <style name="Base.Theme.checklist" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:colorPrimary">@color/white</item>
+        <item name="android:colorPrimaryDark">@color/blue</item>
+        <item name="android:colorAccent">@color/orange</item>
     </style>
 
     <style name="Theme.checklist" parent="Base.Theme.checklist" />

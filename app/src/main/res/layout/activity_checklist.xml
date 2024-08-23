@@ -46,21 +46,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:gravity="center">
 
             <Button
                 android:id="@+id/addCheckboxButton"
                 android:layout_width="150sp"
-                android:layout_height="wrap_content"
+                android:layout_height="70sp"
                 android:layout_marginRight="37sp"
                 android:text="Add Task"
+                android:backgroundTint="@color/blue"
                 android:layout_marginEnd="8dp"/>
 
             <Button
                 android:id="@+id/deleteCheckboxButton"
                 android:layout_width="150sp"
-                android:layout_height="wrap_content"
+                android:layout_height="70sp"
                 android:layout_marginLeft="37sp"
+                android:backgroundTint="@color/blue"
                 android:text="Delete Task"/>
     </LinearLayout>
 
@@ -68,25 +72,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingTop="10dp"
         android:gravity="center">
 
         <Button
             android:id="@+id/backButton"
             android:layout_width="180sp"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:text="Back to Projects"
             android:layout_marginEnd="16dp"
             android:padding="16dp"
-            android:background="@color/purple_500"
+            android:backgroundTint="@color/blue"
             android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/closeButton"
             android:layout_width="180sp"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:text="Close Project"
             android:padding="16dp"
-            android:background="@color/purple_500"
-            android:textColor="@android:color/white" />
+            android:backgroundTint="@color/red"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
 </LinearLayout>

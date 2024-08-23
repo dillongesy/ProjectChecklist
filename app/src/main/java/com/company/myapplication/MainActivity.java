@@ -150,12 +150,24 @@ public class MainActivity extends AppCompatActivity{
 
     private long insertNewProject(String name, String location, String manager) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long val;
         ContentValues values = new ContentValues();
+        if (location != null) {
+            values.put("location", location);
+        }
+        if (manager != null) {
+            values.put("manager", manager);
+        }
         values.put("name", name);
-        values.put("location", location);
-        values.put("manager", manager);
+        db.beginTransaction();
+        try {
+            val = db.insert("projects", null, values);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
 
-        return db.insert("projects", null, values);
+        return val;
     }
 
 }

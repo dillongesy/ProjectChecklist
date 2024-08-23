@@ -33,8 +33,8 @@ public class newChecklist  extends AppCompatActivity{
                 String projectLocation = projectLocationEditText.getText().toString().trim();
                 String projectManager = projectManagerEditText.getText().toString().trim();
 
-                if (projectName.isEmpty() || projectLocation.isEmpty() || projectManager.isEmpty()) {
-                    Toast.makeText(newChecklist.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                if (projectName.isEmpty()) {// || projectLocation.isEmpty() || projectManager.isEmpty()) {
+                    Toast.makeText(newChecklist.this, "Please fill in the name field", Toast.LENGTH_SHORT).show();
                 } else {
                     // Pass data back to MainActivity (you can use Intent or another method)
                     Intent intent = new Intent();

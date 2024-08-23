@@ -60,7 +60,6 @@ public class DBHelper extends SQLiteOpenHelper{
         values.put(COLUMN_NAME, name);
         values.put(COLUMN_LOCATION, location);
         values.put(COLUMN_MANAGER, manager);
-
         long result = db.insert(TABLE_PROJECTS, null, values);
         return result != -1;
     }
@@ -73,24 +72,44 @@ public class DBHelper extends SQLiteOpenHelper{
     // Delete a project by ID
     public void deleteProject(int projectId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_PROJECTS, COLUMN_PROJECT_ID + "=?", new String[]{String.valueOf(projectId)});
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_PROJECTS, COLUMN_PROJECT_ID + "=?", new String[]{String.valueOf(projectId)});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     // Insert a check into the checklists table
     public long insertChecklist(String taskName, int isChecked, int projectId) {
         SQLiteDatabase db = this.getWritableDatabase();
+        long val;
         ContentValues values = new ContentValues();
         values.put(COLUMN_TASK_NAME, taskName);
         values.put(COLUMN_IS_CHECKED, isChecked);
         values.put(COLUMN_PROJECT_ID_FK, projectId);
+        db.beginTransaction();
+        try {
+            val = db.insert(TABLE_CHECKLISTS, null, values);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
 
-        return db.insert(TABLE_CHECKLISTS, null, values);
+        return val;
     }
 
     // Delete a set of tasks from the tasks table when the project is closed
     public void deleteWholeChecklist(int projectId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_CHECKLISTS,  COLUMN_PROJECT_ID_FK + "=?", new String[]{String.valueOf(projectId)});
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_CHECKLISTS,  COLUMN_PROJECT_ID_FK + "=?", new String[]{String.valueOf(projectId)});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     //Delete a task from one of the sets of checklists
