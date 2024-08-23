@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity{
     GridLayout projectGrid;
     private ActivityResultLauncher<Intent> newChecklistLauncher;
     private DBHelper dbHelper;
+    private boolean startup = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +57,19 @@ public class MainActivity extends AppCompatActivity{
                 Intent intent = new Intent(MainActivity.this, newChecklist.class);
                 newChecklistLauncher.launch(intent);
         });
+    }
 
-        //Get projects, display them, make them clickable
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshProjectsList();
+    }
+
+    private void refreshProjectsList() {
+        projectGrid.removeAllViews();
         loadProjectsFromDB();
     }
+
     private void addProjectToGrid(String projectName, String projectLocation, String projectManager, int projectId) {
         // Get the screen width for calculating half of the width
         Display display = getWindowManager().getDefaultDisplay();
@@ -104,13 +114,13 @@ public class MainActivity extends AppCompatActivity{
     private void loadProjectsFromDB() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] columns = {"id", "name", "location", "manager"};
+        String[] columns = {"projectId", "name", "location", "manager"};
         Cursor cursor = db.query("projects", columns, null, null, null, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 // Get column indices safely
-                int idIndex = cursor.getColumnIndex("id");
+                int idIndex = cursor.getColumnIndex("projectId");
                 int nameIndex = cursor.getColumnIndex("name");
                 int locationIndex = cursor.getColumnIndex("location");
                 int managerIndex = cursor.getColumnIndex("manager");

@@ -59,7 +59,7 @@
 
             <Button
                 android:id="@+id/newProjBtn"
-                android:layout_width="351dp"
+                android:layout_width="370dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
                 android:background="@color/purple_500"

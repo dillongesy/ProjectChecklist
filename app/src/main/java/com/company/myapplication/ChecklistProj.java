@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -35,6 +38,7 @@ public class ChecklistProj extends AppCompatActivity{
     private boolean isDeleting = false;
     private ArrayList<CheckBox> checkBoxList = new ArrayList<>();
     private ArrayList<View> deleteButtons = new ArrayList<>();
+    private DBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +59,12 @@ public class ChecklistProj extends AppCompatActivity{
         projectLocation.setText(intent.getStringExtra("projectLocation"));
         projectManager.setText(intent.getStringExtra("projectManager"));
 
-        DBHelper dbHelper = new DBHelper(this);
+        dbHelper = new DBHelper(this);
         database = dbHelper.getWritableDatabase();
 
-        int projectId = getIntent().getIntExtra("projectId", -1);
+        projectId = getIntent().getIntExtra("projectId", -1);
         if (projectId != -1) {
-            loadChecklistFromDB();
+            loadChecklistFromDB(projectId);
         }
 
         addCheckboxButton.setOnClickListener(v -> addTaskDialog());
@@ -72,59 +76,56 @@ public class ChecklistProj extends AppCompatActivity{
             deleteButton.setVisibility(isDeleting ? View.VISIBLE : View.GONE);
         }
 
-        updateDeleteButtonState();
     }
 
-    private void loadChecklistFromDB() {
+    private void loadChecklistFromDB(int projectId) {
         checklistContainer.removeAllViews();
         checkBoxList.clear();
         deleteButtons.clear();
         // Query the tasks for this project
-        Cursor cursor = database.query("tasks", null, "project_id = ?", new String[]{String.valueOf(projectId)}, null, null, null);
+        Cursor cursor = database.rawQuery("SELECT * FROM checklists WHERE project_id = ?", new String[]{String.valueOf(projectId)});
+        if (cursor.moveToFirst()) {
+            do {
+                String taskName = cursor.getString(cursor.getColumnIndexOrThrow("task_name"));
+                int isChecked = cursor.getInt(cursor.getColumnIndexOrThrow("is_checked"));
 
-        // Get the column indices
-        int idColumnIndex = cursor.getColumnIndex("id");
-        int taskNameColumnIndex = cursor.getColumnIndex("task_name");
-        int isCheckedColumnIndex = cursor.getColumnIndex("is_checked");
+                CheckBox checkBox = new CheckBox(this);
+                checkBox.setText(taskName);
+                checkBox.setChecked(isChecked == 1);
+                checkBox.setTextSize(20);
+                checkBox.setOnCheckedChangeListener((ButtonView, isChecked1) -> updateTaskInDB(taskName, isChecked1));
+                //new
+                LinearLayout.LayoutParams checkBoxParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 168);
+                checkBoxParams.setMargins(0, 0, 0, 8);
+                checkBox.setLayoutParams(checkBoxParams);
 
-        // Check that the columns exist
-        if (idColumnIndex == -1 || taskNameColumnIndex == -1 || isCheckedColumnIndex == -1) {
-            // Print an error message or log
-            Toast.makeText(this, "Column names do not match", Toast.LENGTH_SHORT).show();
-            return;
+                //later
+                checkBoxList.add(checkBox);
+
+                LinearLayout row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+
+                Button deleteButton = new Button(this);
+                deleteButton.setText("-");
+                deleteButton.setBackgroundColor(Color.RED);
+                deleteButton.setTypeface(null, Typeface.BOLD);
+                //deleteButton.setLayoutParams(new LinearLayout.LayoutParams(125, LinearLayout.LayoutParams.WRAP_CONTENT));
+                LinearLayout.LayoutParams deleteButtonParams = new LinearLayout.LayoutParams(125, LinearLayout.LayoutParams.WRAP_CONTENT);
+                deleteButtonParams.setMargins(0, 0, 0, 8);
+                deleteButton.setLayoutParams(deleteButtonParams);
+
+                deleteButton.setOnClickListener(v -> deleteTask(checkBox, row));
+                deleteButtons.add(deleteButton);
+
+                // Add delete button and checkbox to the row
+                row.addView(deleteButton);
+                row.addView(checkBox);
+
+                // Add the row to the checklist container
+                checklistContainer.addView(row);
+            } while (cursor.moveToNext());
         }
-
-        // Iterate through the cursor to load tasks
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(idColumnIndex);
-            String taskName = cursor.getString(taskNameColumnIndex);
-            boolean isChecked = cursor.getInt(isCheckedColumnIndex) == 1;
-
-            // Create a new checkbox and set its properties
-            CheckBox checkBox = new CheckBox(this);
-            checkBox.setText(taskName);
-            checkBox.setChecked(isChecked);
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked1) -> updateTaskInDB(taskName, isChecked1));
-            checkBoxList.add(checkBox);
-
-            LinearLayout row = new LinearLayout(this);
-            row.setOrientation(LinearLayout.HORIZONTAL);
-
-            Button deleteButton = new Button(this);
-            deleteButton.setText("-");
-            deleteButton.setLayoutParams(new LinearLayout.LayoutParams(125, LinearLayout.LayoutParams.WRAP_CONTENT));
-            deleteButton.setOnClickListener(v -> deleteTask(checkBox, row));
-            deleteButtons.add(deleteButton);
-
-            // Add delete button and checkbox to the row
-            row.addView(deleteButton);
-            row.addView(checkBox);
-
-            // Add the row to the checklist container
-            checklistContainer.addView(row);
-        }
-
-        cursor.close();
+            cursor.close();
     }
 
     private void addTaskDialog() {
@@ -151,17 +152,27 @@ public class ChecklistProj extends AppCompatActivity{
     }
 
     private void addTaskToDB(String taskName) {
-        ContentValues values = new ContentValues();
-        values.put("task_name", taskName);
-        values.put("is_checked", 0);
-        values.put("project_id", projectId);
-
-        long taskId = database.insert("tasks", null, values);
+        if (isDeleting) {
+            toggleDeleteMode();
+        }
+        for (int i =0; i < checkBoxList.size(); i++){
+            if (checkBoxList.get(i).getText().toString().equals(taskName)) {
+                Toast.makeText(this, "Cannot have duplicate tasks", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        long taskId = dbHelper.insertChecklist(taskName, 0, projectId);
         if (taskId != -1) {
             CheckBox checkBox = new CheckBox(this);
             checkBox.setText(taskName);
             checkBox.setChecked(false);
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> updateTaskInDB(taskName, isChecked));
+            checkBox.setTextSize(20);
+            //new
+            LinearLayout.LayoutParams checkBoxParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 168);
+            checkBoxParams.setMargins(0, 0, 0, 8);
+            checkBox.setLayoutParams(checkBoxParams);
+
+            //later
             checkBoxList.add(checkBox);
 
             LinearLayout row = new LinearLayout(this);
@@ -169,8 +180,14 @@ public class ChecklistProj extends AppCompatActivity{
 
             Button deleteButton = new Button(this);
             deleteButton.setText("-");
+            deleteButton.setBackgroundColor(Color.RED);
+            deleteButton.setTypeface(null, Typeface.BOLD);
             deleteButton.setVisibility(View.GONE);
-            deleteButton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            //deleteButton.setLayoutParams(new LinearLayout.LayoutParams(125, LinearLayout.LayoutParams.WRAP_CONTENT));
+            LinearLayout.LayoutParams deleteButtonParams = new LinearLayout.LayoutParams(125, LinearLayout.LayoutParams.WRAP_CONTENT);
+            deleteButtonParams.setMargins(0, 0, 0, 8);
+            deleteButton.setLayoutParams(deleteButtonParams);
+
             deleteButton.setOnClickListener(v -> deleteTask(checkBox, row));
             deleteButtons.add(deleteButton);
 
@@ -186,7 +203,7 @@ public class ChecklistProj extends AppCompatActivity{
     private void updateTaskInDB(String taskName, boolean isChecked) {
         ContentValues values = new ContentValues();
         values.put("is_checked", isChecked ? 1 : 0);
-        database.update("tasks", values, "task_name = ? AND project_id = ?", new String[]{taskName, String.valueOf(projectId)});
+        database.update("checklists", values, "task_name = ? AND project_id = ?", new String[]{taskName, String.valueOf(projectId)});
     }
 
     private void toggleDeleteMode() {
@@ -200,7 +217,8 @@ public class ChecklistProj extends AppCompatActivity{
 
     private void deleteTask(CheckBox checkBox, LinearLayout row) {
         String taskName = checkBox.getText().toString();
-        database.delete("tasks", "task_name = ? AND project_id = ?", new String[]{taskName, String.valueOf(projectId)});
+        dbHelper.deleteCheck(taskName, projectId);
+
         checklistContainer.removeView(row);
         checkBoxList.remove(checkBox);
 
@@ -217,11 +235,11 @@ public class ChecklistProj extends AppCompatActivity{
     private void confirmCloseProject() {
         new AlertDialog.Builder(this)
                 .setTitle("Close Project")
-                .setMessage("Are you sure you want to close and delete this project?")
+                .setMessage("Are you sure you want to close and delete this project? This will delete the project from this device.")
                 .setPositiveButton("Yes", (dialog, which) -> {
                     // Delete the project and its tasks from the database
-                    database.delete("projects", "id = ?", new String[]{String.valueOf(projectId)});
-                    database.delete("tasks", "project_id = ?", new String[]{String.valueOf(projectId)});
+                    dbHelper.deleteProject(projectId);
+                    dbHelper.deleteWholeChecklist(projectId);
                     Toast.makeText(this, "Project deleted", Toast.LENGTH_SHORT).show();
                     finish(); // Go back to the previous screen
                 })
