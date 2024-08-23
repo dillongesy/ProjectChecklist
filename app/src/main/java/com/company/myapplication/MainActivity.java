@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity{
 
         // Set a click listener for the project button
         projectButton.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "Opening Project: " + projectName, Toast.LENGTH_SHORT).show();
             // You can start a new activity or manage the project here
             Intent intent = new Intent(MainActivity.this, ChecklistProj.class);
             intent.putExtra("projectId", projectId);
