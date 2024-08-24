@@ -132,8 +132,4 @@ public class DBHelper extends SQLiteOpenHelper{
         db.update(TABLE_CHECKLISTS, values, COLUMN_TASK_NAME + " = ?", new String[]{String.valueOf(projectId)});
         db.close();
     }
-
-
-
-
 }
