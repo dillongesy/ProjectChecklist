@@ -124,7 +124,8 @@ public class ChecklistProj extends AppCompatActivity{
                 checklistContainer.addView(row);
             } while (cursor.moveToNext());
         }
-            cursor.close();
+        cursor.close();
+        deleteCheckboxButton.setEnabled(!checkBoxList.isEmpty());
     }
 
     private void addTaskDialog() {

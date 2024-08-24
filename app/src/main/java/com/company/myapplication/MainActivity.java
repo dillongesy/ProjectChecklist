@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity{
     GridLayout projectGrid;
     private ActivityResultLauncher<Intent> newChecklistLauncher;
     private DBHelper dbHelper;
-    private boolean startup = true;
     int[] imageResources = {
             R.drawable.concrete1,
             R.drawable.concrete2,
