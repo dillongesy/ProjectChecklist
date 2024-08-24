@@ -109,7 +109,6 @@ public class ChecklistProj extends AppCompatActivity{
                 deleteButton.setText("-");
                 deleteButton.setBackgroundColor(Color.RED);
                 deleteButton.setTypeface(null, Typeface.BOLD);
-                //deleteButton.setLayoutParams(new LinearLayout.LayoutParams(125, LinearLayout.LayoutParams.WRAP_CONTENT));
                 LinearLayout.LayoutParams deleteButtonParams = new LinearLayout.LayoutParams(125, LinearLayout.LayoutParams.WRAP_CONTENT);
                 deleteButtonParams.setMargins(0, 0, 0, 8);
                 deleteButton.setLayoutParams(deleteButtonParams);
@@ -167,6 +166,7 @@ public class ChecklistProj extends AppCompatActivity{
             checkBox.setText(taskName);
             checkBox.setChecked(false);
             checkBox.setTextSize(20);
+            checkBox.setOnCheckedChangeListener((ButtonView, isChecked1) -> updateTaskInDB(taskName, isChecked1));
             //new
             LinearLayout.LayoutParams checkBoxParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 168);
             checkBoxParams.setMargins(0, 0, 0, 8);

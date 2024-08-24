@@ -19,12 +19,22 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.Toast;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity{
     Button newProj;
     GridLayout projectGrid;
     private ActivityResultLauncher<Intent> newChecklistLauncher;
     private DBHelper dbHelper;
     private boolean startup = true;
+    int[] imageResources = {
+            R.drawable.concrete1,
+            R.drawable.concrete2,
+            R.drawable.concrete3,
+            R.drawable.concrete4,
+            R.drawable.concrete5,
+            R.drawable.concrete6
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,18 +88,20 @@ public class MainActivity extends AppCompatActivity{
         display.getSize(size);
         int screenWidth = size.x;
 
-        //HERE
+        Random random = new Random();
+        int randomImageIndex = random.nextInt(imageResources.length);
+
         // Create a button for the new project
         Button projectButton = new Button(this);
         projectButton.setText(projectName);
         projectButton.setTypeface(null, Typeface.BOLD);
 
+        projectButton.setBackgroundResource(imageResources[randomImageIndex]);
+
         // Set button style
         projectButton.setPadding(20, 20, 20, 20);
-        projectButton.setBackgroundColor(getResources().getColor(R.color.lighterblue));
         projectButton.setGravity(Gravity.CENTER);
         projectButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        //NOTHERE
 
         GridLayout.LayoutParams params = new GridLayout.LayoutParams();
         params.width = screenWidth / 2 - 90; // Half the screen width minus padding
