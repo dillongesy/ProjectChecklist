@@ -6,18 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".newChecklist">
 
+    <LinearLayout
+        android:id="@+id/TitleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_launcher_foreground" />
+    </LinearLayout>
+
     <!-- Project Name -->
     <EditText
         android:id="@+id/projectName"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Project Name (REQUIRED)"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp"
+        android:hint="Project Name (REQUIRED)"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TitleLayout" />
 
     <!-- Project Location -->
     <EditText
@@ -46,26 +62,65 @@
         android:layout_marginEnd="16dp"/>
 
     <!-- Buttons for Create and Cancel -->
+
+    <EditText
+        android:id="@+id/listTextView"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Loaded list: N/A"
+        android:inputType="none"
+        android:enabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/projectManager" />
+
     <LinearLayout
-        android:id="@+id/buttonLayout"
+        android:id="@+id/upperBtnLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/projectManager">
+        app:layout_constraintTop_toBottomOf="@+id/listTextView">
+
+
+        <Button
+            android:id="@+id/newList"
+            android:layout_width="150dp"
+            android:layout_height="75dp"
+            android:backgroundTint="@color/blue"
+            android:text="Pick List" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/upperBtnLayout">
 
         <Button
             android:id="@+id/cancelButton"
             android:layout_width="150dp"
             android:layout_height="75dp"
-            android:backgroundTint="@color/blue"
             android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/blue"
             android:text="Cancel" />
 
         <Button

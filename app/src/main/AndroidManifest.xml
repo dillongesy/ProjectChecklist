@@ -19,6 +19,12 @@
             android:name=".newChecklist"
             android:exported="true"/>
         <activity
+            android:name=".ChecklistList"
+            android:exported="true"/>
+        <activity
+            android:name=".ChecklistsPage"
+            android:exported="true"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name">
