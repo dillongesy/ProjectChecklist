@@ -14,11 +14,11 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity{
@@ -49,13 +49,19 @@ public class MainActivity extends AppCompatActivity{
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
                         Intent data = result.getData();
+                        ArrayList<String> checkItems = ScreenHelper.getInstance().getCheckItems();
                         if (data != null) {
                             String projectName = data.getStringExtra("projectName");
                             String projectLocation = data.getStringExtra("projectLocation");
                             String projectManager = data.getStringExtra("projectManager");
 
                             long newProjectId = insertNewProject(projectName, projectLocation, projectManager);
-
+                            if (newProjectId != -1 && checkItems != null) {
+                                for (String task : checkItems) {
+                                    dbHelper.insertChecklist(task, 0, (int) newProjectId);
+                                }
+                                ScreenHelper.getInstance().clearData();
+                            }
                             Toast.makeText(this, "Project Created: " + projectName, Toast.LENGTH_SHORT).show();
                             addProjectToGrid(projectName, projectLocation, projectManager, (int) newProjectId);
                         }
@@ -64,8 +70,8 @@ public class MainActivity extends AppCompatActivity{
         );
 
         newProj.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity.this, newChecklist.class);
-                newChecklistLauncher.launch(intent);
+            Intent intent = new Intent(MainActivity.this, newChecklist.class);
+            newChecklistLauncher.launch(intent);
         });
     }
 
@@ -181,7 +187,6 @@ public class MainActivity extends AppCompatActivity{
         } finally {
             db.endTransaction();
         }
-
         return val;
     }
 }

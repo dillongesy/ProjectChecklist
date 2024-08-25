@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper{
     private static final String DATABASE_NAME = "projects.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 6;
 
     // Table and column names for projects
     private static final String TABLE_PROJECTS = "projects";
@@ -24,6 +24,17 @@ public class DBHelper extends SQLiteOpenHelper{
     private static final String COLUMN_TASK_NAME = "task_name";
     private static final String COLUMN_IS_CHECKED = "is_checked";
     private static final String COLUMN_PROJECT_ID_FK = "project_id";
+
+    // Table and column names for DEFAULT CHECK LISTS
+    private static final String TABLE_DEFAULT_CHECKLISTS = "defaultChecklists";
+    private static final String COLUMN_DEFAULT_ID = "defaultId";
+    private static final String COLUMN_DEFAULT_NAME = "checklistName";
+
+    // Table and column names for DEFAULT CHECK LISTS checks
+    private static final String TABLE_DEFAULT_CHECKLISTS_CHECKS = "defaultChecklistsCheck";
+    private static final String COLUMN_CHECK_ID = "checkId";
+    private static final String COLUMN_CHECK_NAME = "checkName";
+    private static final String COLUMN_DEFAULT_ID_FK = "default_id";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -45,12 +56,26 @@ public class DBHelper extends SQLiteOpenHelper{
                 + COLUMN_PROJECT_ID_FK + " INTEGER,"
                 + "FOREIGN KEY(" + COLUMN_PROJECT_ID_FK + ") REFERENCES " + TABLE_PROJECTS + "(" + COLUMN_PROJECT_ID + ") ON DELETE CASCADE)";
         db.execSQL(CREATE_CHECKLISTS_TABLE);
+
+        String CREATE_DEFAULTCHECKLISTS_TABLE = "CREATE TABLE " + TABLE_DEFAULT_CHECKLISTS + "("
+                + COLUMN_DEFAULT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_DEFAULT_NAME + " TEXT" + ")";
+        db.execSQL(CREATE_DEFAULTCHECKLISTS_TABLE);
+
+        String CREATE_DEFAULTLISTS_TABLE = "CREATE TABLE " + TABLE_DEFAULT_CHECKLISTS_CHECKS + "("
+                + COLUMN_CHECK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_CHECK_NAME + " TEXT,"
+                + COLUMN_DEFAULT_ID_FK + " INTEGER,"
+                + "FOREIGN KEY(" + COLUMN_DEFAULT_ID_FK + ") REFERENCES " + TABLE_DEFAULT_CHECKLISTS + "(" + COLUMN_DEFAULT_ID + ") ON DELETE CASCADE)";
+        db.execSQL(CREATE_DEFAULTLISTS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHECKLISTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROJECTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DEFAULT_CHECKLISTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DEFAULT_CHECKLISTS_CHECKS);
         onCreate(db);
     }
 
@@ -131,5 +156,56 @@ public class DBHelper extends SQLiteOpenHelper{
         values.put(COLUMN_IS_CHECKED, isChecked);
         db.update(TABLE_CHECKLISTS, values, COLUMN_TASK_NAME + " = ?", new String[]{String.valueOf(projectId)});
         db.close();
+    }
+
+    public long insertChecklistIntoList(String taskName, int checkId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long val;
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_CHECK_NAME, taskName);
+        values.put(COLUMN_DEFAULT_ID_FK, checkId);
+        db.beginTransaction();
+        try {
+            val = db.insert(TABLE_DEFAULT_CHECKLISTS_CHECKS, null, values);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return val;
+    }
+
+    public void deleteChecklist(int checkId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_DEFAULT_CHECKLISTS, COLUMN_DEFAULT_ID + "=?", new String[]{String.valueOf(checkId)});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void deleteCheckFromChecklist(String taskName, int checkId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_DEFAULT_CHECKLISTS_CHECKS, COLUMN_DEFAULT_ID_FK + "=? AND " + COLUMN_CHECK_NAME + "=?", new String[]{String.valueOf(checkId), taskName});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+    public void deleteWholeChecklistList(int checkId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            //TODO
+            db.delete(TABLE_DEFAULT_CHECKLISTS_CHECKS,  COLUMN_DEFAULT_ID_FK + "=?", new String[]{String.valueOf(checkId)});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 }
